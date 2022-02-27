@@ -1,9 +1,4 @@
-import 'dart:js';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'fire_auth.dart';
 import 'list_users.dart';
 import 'register_page.dart';
 import 'widgets/custom_checkbox.dart';
@@ -14,11 +9,10 @@ class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
+
 class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
   bool passwordVisible = false;
+
   void togglePassword() {
     setState(() {
       passwordVisible = !passwordVisible;
@@ -36,28 +30,29 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Login to your\naccount',
-                    style: heading2.copyWith(color: textBlack),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Image.asset(
-                    'assets/images/accent.png',
-                    width: 99,
-                    height: 4,
-                  ),
-                ],
+              Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Login to your\naccount',
+                      style: heading2.copyWith(color: textBlack),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Image.asset(
+                      'assets/images/accent.png',
+                      width: 99,
+                      height: 4,
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 height: 48,
               ),
               Form(
-                key: loginFormKey,
                 child: Column(
                   children: [
                     Container(
@@ -66,13 +61,6 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(14.0),
                       ),
                       child: TextFormField(
-                        controller: emailController,
-                        validator: (value) {
-                          if (value!.trim().isEmpty) {
-                            return "email must not be empty";
-                          }
-                          return null;
-                        },
                         decoration: InputDecoration(
                           hintText: 'Email',
                           hintStyle: heading6.copyWith(color: textGrey),
@@ -86,18 +74,11 @@ class _LoginPageState extends State<LoginPage> {
                       height: 32,
                     ),
                     Container(
-
                       decoration: BoxDecoration(
                         color: textWhiteGrey,
                         borderRadius: BorderRadius.circular(14.0),
                       ),
                       child: TextFormField(
-                        validator: (value) {
-                          if (value!.trim().isEmpty) {
-                            return "password must not be empty";
-                          }
-                          return null;
-                        },
                         obscureText: !passwordVisible,
                         decoration: InputDecoration(
                           hintText: 'Password',
@@ -114,8 +95,6 @@ class _LoginPageState extends State<LoginPage> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        controller: passwordController,
-
                       ),
                     ),
                   ],
@@ -137,43 +116,22 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 32,
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width ,
-                height: 56,
-                child: ElevatedButton(
-                    child: Text(
-                      "Login",
-                      style: TextStyle(color: Colors.white,fontSize: heading5.fontSize),
-                    ),
-                    onPressed: ()  async {
-                      if (loginFormKey.currentState!.validate()) {
-                        User? user = await FireAuth.signInUsingEmailPassword(
-                          email: emailController.text,
-                          password: passwordController.text
-                          ,
-                        );
+              GestureDetector(
 
-                        print("**********************");
-                        print(user);
+                child: CustomPrimaryButton(
+                  buttonColor: primaryBlue,
+                  textValue: 'Login',
+                  textColor: Colors.white,
 
-                        if (user != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ListUserPage()),
-                          );
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: primaryBlue,
-                      onPrimary: Colors.white,
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(14.0),
-                      ),
-
-                    )),
+                ),
+                onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ListUserPage()));
+              },
               ),
+
               SizedBox(
                 height: 24,
               ),

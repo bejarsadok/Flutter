@@ -1,7 +1,13 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'widgets/custom_checkbox.dart';
 import 'widgets/primary_button.dart';
 import 'theme.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'list_users.dart';
+import 'fire_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -11,11 +17,19 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   bool passwordVisible = false;
   bool passwordConfrimationVisible = false;
+
+  get color => null;
+
   void togglePassword() {
     setState(() {
       passwordVisible = !passwordVisible;
     });
   }
+
+  final TextEditingController controllerEmail = new TextEditingController();
+  final TextEditingController controllerPassword = new TextEditingController();
+  final TextEditingController controllerUsername = new TextEditingController();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +45,21 @@ class _RegisterPageState extends State<RegisterPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center(
+                    child: Image.asset(
+                      'assets/images/logoISB1-1.png',
+                      width: 200,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 32,
+                  ),
                   Text(
-                    'Register new\naccount',
+                    'Register new account',
                     style: heading2.copyWith(color: textBlack),
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 5,
                   ),
                   Image.asset(
                     'assets/images/accent.png',
@@ -46,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
               SizedBox(
-                height: 48,
+                height: 20,
               ),
               Form(
                 child: Column(
@@ -64,10 +87,30 @@ class _RegisterPageState extends State<RegisterPage> {
                             borderSide: BorderSide.none,
                           ),
                         ),
+                        controller: controllerEmail,
                       ),
                     ),
                     SizedBox(
-                      height: 32,
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: textWhiteGrey,
+                        borderRadius: BorderRadius.circular(14.0),
+                      ),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: 'Username',
+                          hintStyle: heading6.copyWith(color: textGrey),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        controller: controllerUsername,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -91,10 +134,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             borderSide: BorderSide.none,
                           ),
                         ),
+                        controller: controllerPassword,
                       ),
                     ),
                     SizedBox(
-                      height: 32,
+                      height: 10,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -129,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               SizedBox(
-                height: 32,
+                height: 10,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -156,33 +200,46 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 32,
               ),
-              CustomPrimaryButton(
-                buttonColor: primaryBlue,
-                textValue: 'Register',
-                textColor: Colors.white,
-              ),
+
               SizedBox(
-                height: 50,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Already have an account? ",
-                    style: regular16pt.copyWith(color: textGrey),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(
-                        context,
-                      );
-                    },
+                width: MediaQuery.of(context).size.width ,
+                height: 56,
+                child: ElevatedButton(
                     child: Text(
-                      'Login',
-                      style: regular16pt.copyWith(color: primaryBlue),
+                      "Register",
+                      style: TextStyle(color: Colors.white,fontSize: heading5.fontSize),
                     ),
-                  ),
-                ],
+                    onPressed: () async {
+                      await firestore.collection("register").add({
+                        "email": controllerEmail.text,
+                        "password": controllerPassword.text,
+                        "username": controllerUsername.text,
+
+                      });
+                      await FireAuth.registerUsingEmailPassword(
+                        email: controllerEmail.text,
+                        password: controllerPassword.text,
+                        name: controllerUsername.text,
+                      );
+                      controllerEmail.clear();
+                      controllerPassword.clear();
+                      controllerUsername.clear();
+
+                      setState(() {});
+
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ListUserPage()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                        primary: primaryBlue,
+                        onPrimary: Colors.white,
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(14.0),
+                        ),
+
+                    )),
               ),
             ],
           ),
